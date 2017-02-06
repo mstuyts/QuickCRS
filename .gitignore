@@ -1,3 +1,7 @@
 *.pyc
 *.bat
 *.zip
+/scripts/
+Makefile
+README.html
+README.txt

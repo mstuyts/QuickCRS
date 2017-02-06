@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/plugins/quickcrs" >
+        <file>icon.png</file>
+    </qresource>
+</RCC>
