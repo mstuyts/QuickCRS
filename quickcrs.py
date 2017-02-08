@@ -20,8 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
-from PyQt4.QtGui import QAction, QIcon
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 # Initialize Qt resources from file resources.py
 import resources
 # Import the code for the dialog
@@ -162,13 +162,22 @@ class quickcrs:
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
         icon_path = ':/plugins/quickcrs/icon.png'
+        settings_icon_path = ':/plugins/quickcrs/settings.png'
         self.add_action(
             icon_path,
             text=self.tr(u'Set Favourite CRS'),
             callback=self.run,
             parent=self.iface.mainWindow())
+        self.add_action(
+            settings_icon_path,
+            text=self.tr(u'Settings'),
+            callback=self.settings,
+            parent=self.iface.mainWindow())
 
-
+    def settings(self):
+        infoString = "test"
+        QMessageBox.information(self.iface.mainWindow(), "Test", infoString)
+        
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
