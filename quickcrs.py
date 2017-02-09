@@ -20,6 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 """
+from qgis.core import *
+from qgis.gui import QgsGenericProjectionSelector
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 # Initialize Qt resources from file resources.py
@@ -27,6 +29,7 @@ import resources
 # Import the code for the dialog
 from quickcrs_dialog import quickcrsDialog
 import os.path
+import sqlite3
 
 
 class quickcrs:
@@ -66,7 +69,6 @@ class quickcrs:
         self.toolbar = self.iface.addToolBar(u'quickcrs')
         self.toolbar.setObjectName(u'quickcrs')
 
-    # noinspection PyMethodMayBeStatic
     def tr(self, message):
         """Get the translation for a string using Qt translation API.
 
@@ -170,14 +172,19 @@ class quickcrs:
             parent=self.iface.mainWindow())
         self.add_action(
             settings_icon_path,
-            text=self.tr(u'Settings'),
+            text=self.tr(u'Settings for QuickCRS'),
             callback=self.settings,
             parent=self.iface.mainWindow())
 
     def settings(self):
-        infoString = "test"
-        QMessageBox.information(self.iface.mainWindow(), "Test", infoString)
+        self.dlg.show()
         
+    def selectcrs(self):
+        projSelector = QgsGenericProjectionSelector()
+        projSelector.exec_()
+        projSelector.selectedCrsId()
+        projSelector.selectedAuthId()
+
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
@@ -191,12 +198,5 @@ class quickcrs:
 
     def run(self):
         """Run method that performs all the real work"""
-        # show the dialog
-        self.dlg.show()
-        # Run the dialog event loop
-        result = self.dlg.exec_()
-        # See if OK was pressed
-        if result:
-            # Do something useful here - delete the line containing pass and
-            # substitute with your code.
-            pass
+        infoString = "test"
+        QMessageBox.information(self.iface.mainWindow(), "Test", infoString)
