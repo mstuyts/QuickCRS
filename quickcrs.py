@@ -29,7 +29,6 @@ import resources
 # Import the code for the dialog
 from quickcrs_dialog import quickcrsDialog
 import os.path
-import sqlite3
 
 
 class quickcrs:
