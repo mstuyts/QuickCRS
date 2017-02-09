@@ -24,7 +24,7 @@
         </font>
        </property>
        <property name="text">
-        <string>This plugin isn't ready yet. Just wait!</string>
+        <string>This plugin is still in development. Please report bugs.</string>
        </property>
        <property name="wordWrap">
         <bool>true</bool>
@@ -34,7 +34,7 @@
      <item>
       <widget class="QLabel" name="label_2">
        <property name="text">
-        <string>Press the button below to select a CRS.</string>
+        <string>Press the button below to select your favourite CRS.</string>
        </property>
       </widget>
      </item>
@@ -55,11 +55,29 @@
        </item>
        <item>
         <widget class="QTextBrowser" name="labelselectedcrs">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>24</height>
+          </size>
+         </property>
          <property name="maximumSize">
           <size>
            <width>16777215</width>
            <height>24</height>
           </size>
+         </property>
+         <property name="baseSize">
+          <size>
+           <width>0</width>
+           <height>24</height>
+          </size>
+         </property>
+         <property name="verticalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
+         <property name="horizontalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
          </property>
          <property name="html">
           <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;

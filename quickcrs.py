@@ -6,7 +6,6 @@
  One click to enable your favourite CRS (OTF)
                               -------------------
         begin                : 2017-02-06
-        git sha              : $Format:%H$
         copyright            : (C) 2017 by Michel Stuyts
         email                : info@stuyts.xyz
  ***************************************************************************/
@@ -29,7 +28,7 @@ import resources
 # Import the code for the dialog
 from quickcrs_dialog import quickcrsDialog
 import os.path
-import sqlite3
+
 
 
 class quickcrs:
@@ -43,27 +42,18 @@ class quickcrs:
             application at run time.
         :type iface: QgsInterface
         """
+        self.dlg = quickcrsDialog()
         global selectedcrs
-        selectedcrs=""
+        s = QSettings()
+        selectedcrs=s.value("quickcrs/crs", "")
+        if selectedcrs=="":
+            self.dlg.labelselectedcrs.setText("No CRS selected")
+        else:
+            self.dlg.labelselectedcrs.setText(selectedcrs)
         # Save reference to the QGIS interface
         self.iface = iface
         # initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)
-        # initialize locale
-        locale = QSettings().value('locale/userLocale')[0:2]
-        locale_path = os.path.join(
-            self.plugin_dir,
-            'i18n',
-            'quickcrs_{}.qm'.format(locale))
-
-        if os.path.exists(locale_path):
-            self.translator = QTranslator()
-            self.translator.load(locale_path)
-
-            if qVersion() > '4.3.3':
-                QCoreApplication.installTranslator(self.translator)
-
-
         # Declare instance attributes
         self.actions = []
         self.menu = self.tr(u'&QuickCRS')
@@ -71,7 +61,7 @@ class quickcrs:
         self.toolbar = self.iface.addToolBar(u'quickcrs')
         self.toolbar.setObjectName(u'quickcrs')
         # Create the dialog (after translation) and keep reference
-        self.dlg = quickcrsDialog()
+        
         self.dlg.pushButton.clicked.connect(self.selectcrs)
 
 
@@ -185,22 +175,19 @@ class quickcrs:
         self.dlg.show()
         
     def savesettings(self):
-        print selectedcrs
+        # print selectedcrs
+        s = QSettings()
+        s.setValue("quickcrs/crs", selectedcrs)
 
     def selectcrs(self):
         projSelector = QgsGenericProjectionSelector()
         projSelector.exec_()
         projSelector.selectedCrsId()
+        #projSelector.selectedEpsg()
         global selectedcrs
         selectedcrs=projSelector.selectedAuthId()
         self.dlg.labelselectedcrs.setText(selectedcrs)
         self.dlg.show()
-        # self.dlg = quickcrsDialog()
-        # self.dlg.label_selected_crs.setText(selectedcrs)
-        # self.dlg.show()
-
-        # s = QSettings()
-        # s.setValue("quickcrs/crsid", QgsCoordinateReferenceSystem( projSelector.selectedCrsId(),  QgsCoordinateReferenceSystem.InternalCrsId ))
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
@@ -215,5 +202,18 @@ class quickcrs:
 
     def run(self):
         """Run method that performs all the real work"""
-        infoString = "test"
-        QMessageBox.information(self.iface.mainWindow(), "Test", infoString)
+        s = QSettings()
+        selectedcrs=s.value("quickcrs/crs", "")
+        if selectedcrs=="":
+            self.dlg.show()
+        else:
+            canvas = self.iface.mapCanvas()
+            if not canvas.hasCrsTransformEnabled():
+                canvas.setCrsTransformEnabled(True)
+            #my_crs = QgsCoordinateReferenceSystem(31370)
+            my_crs = QgsCoordinateReferenceSystem()
+            my_crs.createFromUserInput(selectedcrs)
+            canvas.setDestinationCrs(my_crs)
+            canvas.freeze(False)
+            canvas.setMapUnits(0)
+            canvas.refresh()
