@@ -1,6 +1,6 @@
 # QuickCRS
 
-A QGIS plugin to enable your favourite CRS (OTF) with 1 click.
+A QGIS plugin to enable your favourite CRS (OTF).
 
-**THIS IS NOT READY TO USE YET, IT'S STILL IN DEVELOPMENT**
+**THIS IS NOT FINISHED YET, IT'S STILL IN DEVELOPMENT**
 

@@ -29,6 +29,7 @@ import resources
 # Import the code for the dialog
 from quickcrs_dialog import quickcrsDialog
 import os.path
+import sqlite3
 
 
 class quickcrs:
@@ -42,6 +43,8 @@ class quickcrs:
             application at run time.
         :type iface: QgsInterface
         """
+        global selectedcrs
+        selectedcrs=""
         # Save reference to the QGIS interface
         self.iface = iface
         # initialize plugin directory
@@ -67,6 +70,12 @@ class quickcrs:
         # TODO: We are going to let the user set this up in a future iteration
         self.toolbar = self.iface.addToolBar(u'quickcrs')
         self.toolbar.setObjectName(u'quickcrs')
+        # Create the dialog (after translation) and keep reference
+        self.dlg = quickcrsDialog()
+        self.dlg.pushButton.clicked.connect(self.selectcrs)
+
+
+        self.dlg.button_box.accepted.connect(self.savesettings)
 
     def tr(self, message):
         """Get the translation for a string using Qt translation API.
@@ -133,9 +142,6 @@ class quickcrs:
         :rtype: QAction
         """
 
-        # Create the dialog (after translation) and keep reference
-        self.dlg = quickcrsDialog()
-
         icon = QIcon(icon_path)
         action = QAction(icon, text, parent)
         action.triggered.connect(callback)
@@ -178,11 +184,23 @@ class quickcrs:
     def settings(self):
         self.dlg.show()
         
+    def savesettings(self):
+        print selectedcrs
+
     def selectcrs(self):
         projSelector = QgsGenericProjectionSelector()
         projSelector.exec_()
         projSelector.selectedCrsId()
-        projSelector.selectedAuthId()
+        global selectedcrs
+        selectedcrs=projSelector.selectedAuthId()
+        self.dlg.labelselectedcrs.setText(selectedcrs)
+        self.dlg.show()
+        # self.dlg = quickcrsDialog()
+        # self.dlg.label_selected_crs.setText(selectedcrs)
+        # self.dlg.show()
+
+        # s = QSettings()
+        # s.setValue("quickcrs/crsid", QgsCoordinateReferenceSystem( projSelector.selectedCrsId(),  QgsCoordinateReferenceSystem.InternalCrsId ))
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
