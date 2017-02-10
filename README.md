@@ -1,6 +1,6 @@
 # QuickCRS
 
-A QGIS plugin to enable your favourite CRS (OTF).
+A QGIS plugin to enable your favourite CRS and OTF reprojection with just one click. It's easy to set your default in the Plugin Settings Menu.
 
-**THIS IS NOT FINISHED YET, IT'S STILL IN DEVELOPMENT**
+**This is plugin isn't finished yet. It still has some bugs.  Please [report them](https://github.com/mstuyts/QuickCRS/issues).**
 
