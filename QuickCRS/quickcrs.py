@@ -50,7 +50,7 @@ class quickcrs:
         self.toolbar = self.iface.addToolBar(u'quickcrs')
         self.toolbar.setObjectName(u'quickcrs')
         # Create the dialog (after translation) and keep reference
-        
+
         self.dlg.pushButton.clicked.connect(self.selectcrs)
         global isset
         self.dlg.button_box.accepted.connect(self.savesettings)
@@ -166,7 +166,7 @@ class quickcrs:
         if selectedcrs=="":
             self.dlg.labelselectedcrs.setText("No CRS selected")
         self.dlg.show()
-        
+
     def savesettings(self):
         # print selectedcrs
         global isset
