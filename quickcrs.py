@@ -20,7 +20,7 @@
  ***************************************************************************/
 """
 from qgis.core import *
-from qgis.gui import QgsGenericProjectionSelector
+from qgis.gui import QgsGenericProjectionSelector, QgsProjectionSelector
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 # Initialize Qt resources from file resources.py
@@ -29,19 +29,8 @@ import resources
 from quickcrs_dialog import quickcrsDialog
 import os.path
 
-
-
 class quickcrs:
-    """QGIS Plugin Implementation."""
-
     def __init__(self, iface):
-        """Constructor.
-
-        :param iface: An interface instance that will be passed to this class
-            which provides the hook by which you can manipulate the QGIS
-            application at run time.
-        :type iface: QgsInterface
-        """
         self.dlg = quickcrsDialog()
         global selectedcrs
         s = QSettings()
@@ -63,8 +52,7 @@ class quickcrs:
         # Create the dialog (after translation) and keep reference
         
         self.dlg.pushButton.clicked.connect(self.selectcrs)
-
-
+        global isset
         self.dlg.button_box.accepted.connect(self.savesettings)
 
     def tr(self, message):
@@ -89,49 +77,10 @@ class quickcrs:
         callback,
         enabled_flag=True,
         add_to_menu=True,
-        add_to_toolbar=True,
+        add_to_toolbar=False,
         status_tip=None,
         whats_this=None,
         parent=None):
-        """Add a toolbar icon to the toolbar.
-
-        :param icon_path: Path to the icon for this action. Can be a resource
-            path (e.g. ':/plugins/foo/bar.png') or a normal file system path.
-        :type icon_path: str
-
-        :param text: Text that should be shown in menu items for this action.
-        :type text: str
-
-        :param callback: Function to be called when the action is triggered.
-        :type callback: function
-
-        :param enabled_flag: A flag indicating if the action should be enabled
-            by default. Defaults to True.
-        :type enabled_flag: bool
-
-        :param add_to_menu: Flag indicating whether the action should also
-            be added to the menu. Defaults to True.
-        :type add_to_menu: bool
-
-        :param add_to_toolbar: Flag indicating whether the action should also
-            be added to the toolbar. Defaults to True.
-        :type add_to_toolbar: bool
-
-        :param status_tip: Optional text to show in a popup when mouse pointer
-            hovers over the action.
-        :type status_tip: str
-
-        :param parent: Parent widget for the new action. Defaults None.
-        :type parent: QWidget
-
-        :param whats_this: Optional text to show in the status bar when the
-            mouse pointer hovers over the action.
-
-        :returns: The action that was created. Note that the action is also
-            added to self.actions list.
-        :rtype: QAction
-        """
-
         icon = QIcon(icon_path)
         action = QAction(icon, text, parent)
         action.triggered.connect(callback)
@@ -155,11 +104,49 @@ class quickcrs:
 
         return action
 
+    def add_action_toolbar(
+        self,
+        icon_path,
+        text,
+        callback,
+        enabled_flag=True,
+        add_to_menu=False,
+        add_to_toolbar=True,
+        status_tip=None,
+        whats_this=None,
+        parent=None):
+        icon = QIcon(icon_path)
+        actiontoolbar = QAction(icon, text, parent)
+        actiontoolbar.triggered.connect(callback)
+        actiontoolbar.setEnabled(enabled_flag)
+
+        if status_tip is not None:
+            actiontoolbar.setStatusTip(status_tip)
+
+        if whats_this is not None:
+            actiontoolbar.setWhatsThis(whats_this)
+
+        if add_to_toolbar:
+            self.toolbar.addAction(actiontoolbar)
+
+        if add_to_menu:
+            self.iface.addPluginToMenu(
+                self.menu,
+                actiontoolbar)
+
+        self.actions.append(actiontoolbar)
+
+        return actiontoolbar
+
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
-
         icon_path = ':/plugins/quickcrs/icon.png'
         settings_icon_path = ':/plugins/quickcrs/settings.png'
+        self.add_action_toolbar(
+            icon_path,
+            text=self.tr(u'Set Favourite CRS'),
+            callback=self.run,
+            parent=self.iface.mainWindow())
         self.add_action(
             icon_path,
             text=self.tr(u'Set Favourite CRS'),
@@ -172,12 +159,23 @@ class quickcrs:
             parent=self.iface.mainWindow())
 
     def settings(self):
+        global isrun
+        isrun="no"
+        s = QSettings()
+        selectedcrs=s.value("quickcrs/crs", "")
+        if selectedcrs=="":
+            self.dlg.labelselectedcrs.setText("No CRS selected")
         self.dlg.show()
         
     def savesettings(self):
         # print selectedcrs
+        global isset
+        if isset is None:
+            isset="no"
         s = QSettings()
         s.setValue("quickcrs/crs", selectedcrs)
+        if isset=="no" and isrun=="yes":
+            self.updatecrs()
 
     def selectcrs(self):
         projSelector = QgsGenericProjectionSelector()
@@ -199,21 +197,32 @@ class quickcrs:
         # remove the toolbar
         del self.toolbar
 
+    def updatecrs(self):
+        s = QSettings()
+        selectedcrs=s.value("quickcrs/crs", "")
+        # print selectedcrs
+        canvas = self.iface.mapCanvas()
+        if not canvas.hasCrsTransformEnabled():
+            canvas.setCrsTransformEnabled(True)
+        target_crs = QgsCoordinateReferenceSystem()
+        target_crs.createFromUserInput(selectedcrs)
+        canvas.setDestinationCrs(target_crs)
+        canvas.freeze(False)
+        canvas.setMapUnits(0)
+        canvas.refresh()
 
     def run(self):
         """Run method that performs all the real work"""
         s = QSettings()
         selectedcrs=s.value("quickcrs/crs", "")
+        global isset
+        global isrun
         if selectedcrs=="":
+            global isrun
+            isrun="yes"
+            isset="no"
             self.dlg.show()
         else:
-            canvas = self.iface.mapCanvas()
-            if not canvas.hasCrsTransformEnabled():
-                canvas.setCrsTransformEnabled(True)
-            #my_crs = QgsCoordinateReferenceSystem(31370)
-            my_crs = QgsCoordinateReferenceSystem()
-            my_crs.createFromUserInput(selectedcrs)
-            canvas.setDestinationCrs(my_crs)
-            canvas.freeze(False)
-            canvas.setMapUnits(0)
-            canvas.refresh()
+            isset="yes"
+            isrun="yes"
+            self.updatecrs()
