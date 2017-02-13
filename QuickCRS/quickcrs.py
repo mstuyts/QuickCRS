@@ -50,9 +50,7 @@ class quickcrs:
         self.toolbar = self.iface.addToolBar(u'quickcrs')
         self.toolbar.setObjectName(u'quickcrs')
         # Create the dialog (after translation) and keep reference
-
         self.dlg.pushButton.clicked.connect(self.selectcrs)
-        global isset
         self.dlg.button_box.accepted.connect(self.savesettings)
 
     def tr(self, message):
@@ -169,8 +167,9 @@ class quickcrs:
 
     def savesettings(self):
         # print selectedcrs
-        global isset
-        if isset is None:
+        try:
+            isset
+        except NameError:
             isset="no"
         s = QSettings()
         s.setValue("quickcrs/crs", selectedcrs)
@@ -178,12 +177,25 @@ class quickcrs:
             self.updatecrs()
 
     def selectcrs(self):
+        s = QSettings()
+        previousselectedcrs=s.value("quickcrs/crs", "")
         projSelector = QgsGenericProjectionSelector()
         projSelector.exec_()
         projSelector.selectedCrsId()
-        #projSelector.selectedEpsg()
         global selectedcrs
         selectedcrs=projSelector.selectedAuthId()
+        test_crs = QgsCoordinateReferenceSystem()
+        test_crs.createFromUserInput(selectedcrs)
+        if selectedcrs=="":
+            selectedcrs=previousselectedcrs
+            self.dlg.label_warning.setText("")
+        else:
+            if(test_crs.toWkt()==""):
+                # User Defined Coordinate Systems are not supported yet
+                self.dlg.label_warning.setText("User Defined Coordinate Systems are not yet supported by this plugin.")
+                selectedcrs=""
+            else:
+                self.dlg.label_warning.setText("")
         self.dlg.labelselectedcrs.setText(selectedcrs)
         self.dlg.show()
 
