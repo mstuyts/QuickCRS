@@ -1,16 +1,8 @@
-# This file contains metadata for your plugin. Since 
-# version 2.0 of QGIS this is the proper way to supply 
-# information about a plugin. The old method of 
-# embedding metadata in __init__.py will 
-# is no longer supported since version 2.0.
-
-# This file should be included when you package your plugin.# Mandatory items:
-
 [general]
 name=QuickCRS
 qgisMinimumVersion=2.0
 description=One click to enable your favourite CRS (OTF)
-version=0.2
+version=0.3
 author=Michel Stuyts
 email=info@stuyts.xyz
 
@@ -18,23 +10,16 @@ about=One click to enable your favourite CRS (OTF)
 
 tracker=https://github.com/mstuyts/QuickCRS/issues
 repository=https://github.com/mstuyts/QuickCRS
-# End of mandatory metadata
 
-# Recommended items:
-
-# Uncomment the following line and add your changelog:
-changelog=version 0.2: added warning about not supporting User Defined Coordinate Systems, s "isset" bug
+changelog=version 0.3: added support for  User Defined Coordinate Systems
+    version 0.2: added warning about not supporting User Defined Coordinate Systems, s "isset" bug
     version 0.1: basic functionality
 
-# Tags are comma separated with spaces allowed
 tags=crs, projection, srs
 
 homepage=https://github.com/mstuyts/QuickCRS
 category=Plugins
 icon=icon.png
-# experimental flag
 experimental=True
-
-# deprecated flag (applies to the whole plugin, not just a single version)
 deprecated=False
 

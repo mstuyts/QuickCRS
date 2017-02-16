@@ -28,6 +28,7 @@ import resources
 # Import the code for the dialog
 from quickcrs_dialog import quickcrsDialog
 import os.path
+import pprint
 
 class quickcrs:
     def __init__(self, iface):
@@ -38,7 +39,7 @@ class quickcrs:
         if selectedcrs=="":
             self.dlg.labelselectedcrs.setText("No CRS selected")
         else:
-            self.dlg.labelselectedcrs.setText(selectedcrs)
+            self.dlg.labelselectedcrs.setText(self.CrsId2AuthID(selectedcrs))
         # Save reference to the QGIS interface
         self.iface = iface
         # initialize plugin directory
@@ -183,21 +184,30 @@ class quickcrs:
         projSelector.exec_()
         projSelector.selectedCrsId()
         global selectedcrs
-        selectedcrs=projSelector.selectedAuthId()
-        test_crs = QgsCoordinateReferenceSystem()
-        test_crs.createFromUserInput(selectedcrs)
+        # selectedcrs=projSelector.selectedAuthId()
+        selectedcrs=projSelector.selectedCrsId()
+        # test_crs = QgsCoordinateReferenceSystem()
+        # test_crs.createFromUserInput(selectedcrs)
         if selectedcrs=="":
             selectedcrs=previousselectedcrs
             self.dlg.label_warning.setText("")
-        else:
-            if(test_crs.toWkt()==""):
+        # else:
+            #if(test_crs.toWkt()==""):
                 # User Defined Coordinate Systems are not supported yet
-                self.dlg.label_warning.setText("User Defined Coordinate Systems are not yet supported by this plugin.")
-                selectedcrs=""
-            else:
-                self.dlg.label_warning.setText("")
-        self.dlg.labelselectedcrs.setText(selectedcrs)
+                #self.dlg.label_warning.setText("User Defined Coordinate Systems are not yet supported by this plugin.")
+                #selectedcrs=""
+            #else:
+                #self.dlg.label_warning.setText("")
+        #self.dlg.labelselectedcrs.setText(selectedcrs)
+        self.dlg.labelselectedcrs.setText(self.CrsId2AuthID(selectedcrs))
         self.dlg.show()
+
+
+    def CrsId2AuthID(self, crsid=""):
+        toconvert = QgsCoordinateReferenceSystem()
+        toconvert.createFromId( crsid, QgsCoordinateReferenceSystem.InternalCrsId )
+        converted=toconvert.authid()
+        return converted
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
@@ -217,7 +227,8 @@ class quickcrs:
         if not canvas.hasCrsTransformEnabled():
             canvas.setCrsTransformEnabled(True)
         target_crs = QgsCoordinateReferenceSystem()
-        target_crs.createFromUserInput(selectedcrs)
+        #target_crs.createFromUserInput(selectedcrs)
+        target_crs.createFromId( selectedcrs, QgsCoordinateReferenceSystem.InternalCrsId )
         canvas.setDestinationCrs(target_crs)
         canvas.freeze(False)
         canvas.setMapUnits(0)
