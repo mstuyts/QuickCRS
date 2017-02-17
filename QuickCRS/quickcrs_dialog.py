@@ -6,7 +6,6 @@
  One click to enable your favourite CRS (OTF)
                              -------------------
         begin                : 2017-02-06
-        git sha              : $Format:%H$
         copyright            : (C) 2017 by Michel Stuyts
         email                : info@stuyts.xyz
  ***************************************************************************/
@@ -22,8 +21,7 @@
 """
 
 import os
-
-from PyQt4 import QtGui, uic
+from PyQt4 import QtGui, QtCore,uic
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'quickcrs_dialog_base.ui'))
@@ -31,11 +29,8 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(
 
 class quickcrsDialog(QtGui.QDialog, FORM_CLASS):
     def __init__(self, parent=None):
-        """Constructor."""
         super(quickcrsDialog, self).__init__(parent)
-        # Set up the user interface from Designer.
-        # After setupUI you can access any designer object by doing
-        # self.<objectname>, and you can use autoconnect slots - see
-        # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
-        # #widgets-and-dialogs-with-auto-connect
+        self.resize(QtCore.QSize(400, 230).expandedTo(self.minimumSizeHint()))
+        self.setWindowIcon(QtGui.QIcon(":/plugins/QuickCRS/icon.png"))
+        self.setWindowFlags( self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint |  QtCore.Qt.CustomizeWindowHint  | QtCore.Qt.WindowTitleHint  )
         self.setupUi(self)

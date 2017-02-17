@@ -23,12 +23,9 @@ from qgis.core import *
 from qgis.gui import QgsGenericProjectionSelector, QgsProjectionSelector
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-# Initialize Qt resources from file resources.py
 import resources
-# Import the code for the dialog
 from quickcrs_dialog import quickcrsDialog
 import os.path
-import pprint
 
 class quickcrs:
     def __init__(self, iface):
@@ -36,8 +33,8 @@ class quickcrs:
         global selectedcrs
         s = QSettings()
         selectedcrs=s.value("quickcrs/crs", "")
-        if selectedcrs=="":
-            self.dlg.labelselectedcrs.setText("No CRS selected")
+        if selectedcrs=="" or selectedcrs==0:
+            self.nocrsselected()
         else:
             self.dlg.labelselectedcrs.setText(self.CrsId2AuthID(selectedcrs))
         # Save reference to the QGIS interface
@@ -47,7 +44,6 @@ class quickcrs:
         # Declare instance attributes
         self.actions = []
         self.menu = self.tr(u'&QuickCRS')
-        # TODO: We are going to let the user set this up in a future iteration
         self.toolbar = self.iface.addToolBar(u'quickcrs')
         self.toolbar.setObjectName(u'quickcrs')
         # Create the dialog (after translation) and keep reference
@@ -65,11 +61,11 @@ class quickcrs:
         :returns: Translated version of message.
         :rtype: QString
         """
-        # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
         return QCoreApplication.translate('quickcrs', message)
 
 
     def add_action(
+        # the action for the menu items
         self,
         icon_path,
         text,
@@ -104,6 +100,7 @@ class quickcrs:
         return action
 
     def add_action_toolbar(
+        # The action for the toolbar button
         self,
         icon_path,
         text,
@@ -138,9 +135,9 @@ class quickcrs:
         return actiontoolbar
 
     def initGui(self):
-        """Create the menu entries and toolbar icons inside the QGIS GUI."""
-        icon_path = ':/plugins/quickcrs/icon.png'
-        settings_icon_path = ':/plugins/quickcrs/settings.png'
+        # Add the toolbar button and the menu items
+        icon_path = ':/plugins/QuickCRS/icon.png'
+        settings_icon_path = ':/plugins/QuickCRS/settings.png'
         self.add_action_toolbar(
             icon_path,
             text=self.tr(u'Set Favourite CRS'),
@@ -157,93 +154,92 @@ class quickcrs:
             callback=self.settings,
             parent=self.iface.mainWindow())
 
-    def settings(self):
-        global isrun
-        isrun="no"
-        s = QSettings()
-        selectedcrs=s.value("quickcrs/crs", "")
-        if selectedcrs=="":
-            self.dlg.labelselectedcrs.setText("No CRS selected")
-        self.dlg.show()
-
     def savesettings(self):
-        # print selectedcrs
+        # Save the selected CRS
         try:
             isset
         except NameError:
             isset="no"
         s = QSettings()
         s.setValue("quickcrs/crs", selectedcrs)
-        if isset=="no" and isrun=="yes":
+        if selectedcrs=="" or selectedcrs==0:
+            isset="no"
+        if isset=="no" and isrun=="yes" and selectedcrs!="":
             self.updatecrs()
 
     def selectcrs(self):
+        # Select a new CRS
         s = QSettings()
         previousselectedcrs=s.value("quickcrs/crs", "")
+        if previousselectedcrs=="" or previousselectedcrs==0:
+            self.nocrsselected()
         projSelector = QgsGenericProjectionSelector()
         projSelector.exec_()
         projSelector.selectedCrsId()
         global selectedcrs
-        # selectedcrs=projSelector.selectedAuthId()
         selectedcrs=projSelector.selectedCrsId()
-        # test_crs = QgsCoordinateReferenceSystem()
-        # test_crs.createFromUserInput(selectedcrs)
-        if selectedcrs=="":
-            selectedcrs=previousselectedcrs
-            self.dlg.label_warning.setText("")
-        # else:
-            #if(test_crs.toWkt()==""):
-                # User Defined Coordinate Systems are not supported yet
-                #self.dlg.label_warning.setText("User Defined Coordinate Systems are not yet supported by this plugin.")
-                #selectedcrs=""
-            #else:
-                #self.dlg.label_warning.setText("")
-        #self.dlg.labelselectedcrs.setText(selectedcrs)
-        self.dlg.labelselectedcrs.setText(self.CrsId2AuthID(selectedcrs))
+        if (selectedcrs=="" or selectedcrs==0 or self.CrsId2AuthID(selectedcrs)==""):
+             selectedcrs=previousselectedcrs
+        if (selectedcrs=="" or selectedcrs==0 or self.CrsId2AuthID(selectedcrs)=="") and (previousselectedcrs=="" or previousselectedcrs==0):
+            self.nocrsselected()
+        else:
+            self.dlg.labelselectedcrs.setText(self.CrsId2AuthID(selectedcrs))
         self.dlg.show()
 
-
-    def CrsId2AuthID(self, crsid=""):
-        toconvert = QgsCoordinateReferenceSystem()
-        toconvert.createFromId( crsid, QgsCoordinateReferenceSystem.InternalCrsId )
-        converted=toconvert.authid()
-        return converted
-
-    def unload(self):
-        """Removes the plugin menu item and icon from QGIS GUI."""
-        for action in self.actions:
-            self.iface.removePluginMenu(
-                self.tr(u'&QuickCRS'),
-                action)
-            self.iface.removeToolBarIcon(action)
-        # remove the toolbar
-        del self.toolbar
-
     def updatecrs(self):
+        # Set the CRS of the project to the CRS that is saved in the settings
         s = QSettings()
         selectedcrs=s.value("quickcrs/crs", "")
-        # print selectedcrs
         canvas = self.iface.mapCanvas()
         if not canvas.hasCrsTransformEnabled():
             canvas.setCrsTransformEnabled(True)
         target_crs = QgsCoordinateReferenceSystem()
-        #target_crs.createFromUserInput(selectedcrs)
         target_crs.createFromId( selectedcrs, QgsCoordinateReferenceSystem.InternalCrsId )
         canvas.setDestinationCrs(target_crs)
         canvas.freeze(False)
         canvas.setMapUnits(0)
         canvas.refresh()
 
+    def CrsId2AuthID(self, crsid=0):
+        toconvert = QgsCoordinateReferenceSystem()
+        if crsid=="" or crsid==0:
+            converted=""
+        else:
+            toconvert.createFromId( int(crsid), QgsCoordinateReferenceSystem.InternalCrsId )
+            converted=toconvert.authid()
+        return converted
+
+    def nocrsselected(self):
+        self.dlg.labelselectedcrs.setText("No CRS selected")
+
+    def unload(self):
+        for action in self.actions:
+            self.iface.removePluginMenu(
+                self.tr(u'&QuickCRS'),
+                action)
+            self.iface.removeToolBarIcon(action)
+        del self.toolbar
+
+    def settings(self):
+        # Run the settings menu
+        global isrun
+        isrun="no"
+        s = QSettings()
+        selectedcrs=s.value("quickcrs/crs", 0)
+        if selectedcrs=="" or selectedcrs==0:
+            self.nocrsselected()
+        self.dlg.show()
+
     def run(self):
-        """Run method that performs all the real work"""
+        # Check wich part of the plugin must be run
         s = QSettings()
         selectedcrs=s.value("quickcrs/crs", "")
         global isset
         global isrun
-        if selectedcrs=="":
-            global isrun
+        if selectedcrs=="" or selectedcrs==0:
             isrun="yes"
             isset="no"
+            self.nocrsselected()
             self.dlg.show()
         else:
             isset="yes"
