@@ -6,10 +6,5 @@ A QGIS plugin to set the CRS of the current project to your favourite CRS and en
 
 _____
 
-*If you installed QuickCRS version 0.2 or older, you have to perform the following Python Script before installing a newer version. If you only installed version 0.3 or newer, you can ignore this message*
-```python
-from PyQt4.QtCore import *
-s = QSettings()
-s.remove("quickcrs/crs")
-```
+*If you installed QuickCRS version 0.2 or older, you should install only version 0.3.2 or newer.*
 
