@@ -33,7 +33,7 @@ class quickcrs:
         global selectedcrs
         s = QSettings()
         selectedcrs=s.value("quickcrs/crs", "")
-        # Check if the CRS in the settings is an integer. In version prior to v0.3 of this plugin, the setting contained a text value instead of an integer.
+        # Check if the CRS in the settings is an integer. In versions prior to v0.3 of this plugin, the setting contained a text value instead of an integer.
         try:
             testsetting = selectedcrs+1
         except TypeError:
