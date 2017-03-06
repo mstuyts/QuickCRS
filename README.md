@@ -11,4 +11,4 @@ _____
 
 _____
 
-*An issue about installation in QGIS for Mac was [reported](https://github.com/mstuyts/QuickCRS/issues/1). If you try to install this plugin on a Mac, please report information about it to the [issue paged](https://github.com/mstuyts/QuickCRS/issues/1).*
+*An issue about installation in QGIS for Mac was [reported](https://github.com/mstuyts/QuickCRS/issues/1). If you try to install this plugin on a Mac, please report information about it to the [issue page](https://github.com/mstuyts/QuickCRS/issues/1).*
