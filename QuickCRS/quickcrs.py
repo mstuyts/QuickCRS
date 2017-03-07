@@ -32,8 +32,15 @@ class quickcrs:
         self.dlg = quickcrsDialog()
         global selectedcrs
         s = QSettings()
-        selectedcrs=s.value("quickcrs/crs", "")
-        if selectedcrs=="" or selectedcrs==0:
+        selectedcrs=s.value("quickcrs/crs", 0)
+        # Check if the CRS in the settings is an integer. In version prior to v0.3 of this plugin, the setting contained a text value instead of an integer.
+        try:
+            testsetting = selectedcrs+1
+        except TypeError:
+            s.setValue("quickcrs/crs", 0)
+            selectedcrs=s.value("quickcrs/crs", 0)
+        # If no CRS is set, run nocrsselected()
+        if selectedcrs=="" or selectedcrs==0 or selectedcrs is None:
             self.nocrsselected()
         else:
             self.dlg.labelselectedcrs.setText(self.CrsId2AuthID(selectedcrs))
@@ -162,25 +169,25 @@ class quickcrs:
             isset="no"
         s = QSettings()
         s.setValue("quickcrs/crs", selectedcrs)
-        if selectedcrs=="" or selectedcrs==0:
+        if selectedcrs=="" or selectedcrs==0 or selectedcrs is None:
             isset="no"
-        if isset=="no" and isrun=="yes" and selectedcrs!="":
+        if isset=="no" and isrun=="yes" and selectedcrs!="" and selectedcrs!=0:
             self.updatecrs()
 
     def selectcrs(self):
         # Select a new CRS
         s = QSettings()
-        previousselectedcrs=s.value("quickcrs/crs", "")
-        if previousselectedcrs=="" or previousselectedcrs==0:
+        previousselectedcrs=s.value("quickcrs/crs", 0)
+        if previousselectedcrs=="" or previousselectedcrs==0 or previousselectedcrs is None:
             self.nocrsselected()
         projSelector = QgsGenericProjectionSelector()
         projSelector.exec_()
         projSelector.selectedCrsId()
         global selectedcrs
         selectedcrs=projSelector.selectedCrsId()
-        if (selectedcrs=="" or selectedcrs==0 or self.CrsId2AuthID(selectedcrs)==""):
+        if (selectedcrs=="" or selectedcrs==0 or self.CrsId2AuthID(selectedcrs)=="" or selectedcrs is None):
              selectedcrs=previousselectedcrs
-        if (selectedcrs=="" or selectedcrs==0 or self.CrsId2AuthID(selectedcrs)=="") and (previousselectedcrs=="" or previousselectedcrs==0):
+        if (selectedcrs=="" or selectedcrs==0 or self.CrsId2AuthID(selectedcrs)=="" or selectedcrs is None) and (previousselectedcrs=="" or previousselectedcrs==0 or previousselectedcrs is None):
             self.nocrsselected()
         else:
             self.dlg.labelselectedcrs.setText(self.CrsId2AuthID(selectedcrs))
@@ -189,7 +196,7 @@ class quickcrs:
     def updatecrs(self):
         # Set the CRS of the project to the CRS that is saved in the settings
         s = QSettings()
-        selectedcrs=s.value("quickcrs/crs", "")
+        selectedcrs=s.value("quickcrs/crs", 0)
         canvas = self.iface.mapCanvas()
         if not canvas.hasCrsTransformEnabled():
             canvas.setCrsTransformEnabled(True)
@@ -202,10 +209,10 @@ class quickcrs:
 
     def CrsId2AuthID(self, crsid=0):
         toconvert = QgsCoordinateReferenceSystem()
-        if crsid=="" or crsid==0:
+        if crsid=="" or crsid==0 or crsid is None:
             converted=""
         else:
-            toconvert.createFromId( int(crsid), QgsCoordinateReferenceSystem.InternalCrsId )
+            toconvert.createFromId(int(crsid), QgsCoordinateReferenceSystem.InternalCrsId)
             converted=toconvert.authid()
         return converted
 
@@ -226,17 +233,17 @@ class quickcrs:
         isrun="no"
         s = QSettings()
         selectedcrs=s.value("quickcrs/crs", 0)
-        if selectedcrs=="" or selectedcrs==0:
+        if selectedcrs=="" or selectedcrs==0 or selectedcrs is None:
             self.nocrsselected()
         self.dlg.show()
 
     def run(self):
         # Check wich part of the plugin must be run
         s = QSettings()
-        selectedcrs=s.value("quickcrs/crs", "")
+        selectedcrs=s.value("quickcrs/crs", 0)
         global isset
         global isrun
-        if selectedcrs=="" or selectedcrs==0:
+        if selectedcrs=="" or selectedcrs==0 or selectedcrs is None:
             isrun="yes"
             isset="no"
             self.nocrsselected()

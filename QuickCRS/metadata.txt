@@ -2,7 +2,7 @@
 name=QuickCRS
 qgisMinimumVersion=2.0
 description=A QGIS plugin to set the CRS of the current project to your favourite CRS and enable OTF reprojection with just one click. It's very easy to set your default CRS in the Plugin Settings Menu.
-version=0.3.1
+version=0.3.4
 author=Michel Stuyts
 email=info@stuyts.xyz
 
@@ -11,7 +11,10 @@ about=One click to enable your favourite CRS (OTF). This plugin was created by M
 tracker=https://github.com/mstuyts/QuickCRS/issues
 repository=https://github.com/mstuyts/QuickCRS
 
-changelog=version 0.3.1: solved some UI bugs in the settings window when no CRS is selected, updated UI
+changelog=version: 0.3.4 second update for NullValue bug on Mac
+    version: 0.3.3 update for NullValue bug on Mac
+    version 0.3.2: solved bug when installing the current version of this plugin, in case version 0.1 or 0.2 of this plugin was already installed.
+    version 0.3.1: solved some UI bugs in the settings window when no CRS is selected, updated UI
     version 0.3: added support for  User Defined Coordinate Systems
     version 0.2: added warning about not supporting User Defined Coordinate Systems, s "isset" bug
     version 0.1: basic functionality
