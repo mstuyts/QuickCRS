@@ -32,26 +32,15 @@ class quickcrs:
         self.dlg = quickcrsDialog()
         global selectedcrs
         s = QSettings()
-<<<<<<< HEAD
         selectedcrs=s.value("quickcrs/crs", 0)
-=======
-        selectedcrs=s.value("quickcrs/crs", "")
->>>>>>> origin/master
         # Check if the CRS in the settings is an integer. In version prior to v0.3 of this plugin, the setting contained a text value instead of an integer.
         try:
             testsetting = selectedcrs+1
         except TypeError:
-<<<<<<< HEAD
             s.setValue("quickcrs/crs", 0)
             selectedcrs=s.value("quickcrs/crs", 0)
         # If no CRS is set, run nocrsselected()
         if selectedcrs=="" or selectedcrs==0 or selectedcrs is None:
-=======
-            s.setValue("quickcrs/crs", '')
-            selectedcrs=s.value("quickcrs/crs", "")
-        # If no CRS is set, run nocrsselected()
-        if selectedcrs=="" or selectedcrs==0:
->>>>>>> origin/master
             self.nocrsselected()
         else:
             self.dlg.labelselectedcrs.setText(self.CrsId2AuthID(selectedcrs))
