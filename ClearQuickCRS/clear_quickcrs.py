@@ -20,12 +20,12 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
+# from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
+from PyQt4.QtCore import QSettings
 from PyQt4.QtGui import QAction, QIcon
 # Initialize Qt resources from file resources.py
 import resources
-# Import the code for the dialog
-from clear_quickcrs_dialog import ClearQuickCRSDialog
+# from clear_quickcrs_dialog import ClearQuickCRSDialog
 import os.path
 
 
@@ -51,23 +51,24 @@ class ClearQuickCRS:
             'i18n',
             'ClearQuickCRS_{}.qm'.format(locale))
 
-        if os.path.exists(locale_path):
-            self.translator = QTranslator()
-            self.translator.load(locale_path)
+        # if os.path.exists(locale_path):
+        #    self.translator = QTranslator()
+        #    self.translator.load(locale_path)
 
-            if qVersion() > '4.3.3':
-                QCoreApplication.installTranslator(self.translator)
+        #    if qVersion() > '4.3.3':
+        #        QCoreApplication.installTranslator(self.translator)
 
 
         # Declare instance attributes
         self.actions = []
-        self.menu = self.tr(u'&ClearQuickCRS')
+        #self.menu = self.tr(u'&ClearQuickCRS')
+        self.menu = '&ClearQuickCRS'
         # TODO: We are going to let the user set this up in a future iteration
         self.toolbar = self.iface.addToolBar(u'ClearQuickCRS')
         self.toolbar.setObjectName(u'ClearQuickCRS')
 
     # noinspection PyMethodMayBeStatic
-    def tr(self, message):
+    #def tr(self, message):
         """Get the translation for a string using Qt translation API.
 
         We implement this ourselves since we do not inherit QObject.
@@ -79,7 +80,7 @@ class ClearQuickCRS:
         :rtype: QString
         """
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
-        return QCoreApplication.translate('ClearQuickCRS', message)
+        # return QCoreApplication.translate('ClearQuickCRS', message)
 
 
     def add_action(
@@ -123,7 +124,8 @@ class ClearQuickCRS:
         icon_path = ':/plugins/ClearQuickCRS/icon.png'
         self.add_action(
             icon_path,
-            text=self.tr(u'Clear QuickCRS Settings'),
+            #text=self.tr(u'Clear QuickCRS Settings'),
+            text='Clear QuickCRS Settings',
             callback=self.run,
             parent=self.iface.mainWindow())
 
@@ -132,7 +134,8 @@ class ClearQuickCRS:
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
             self.iface.removePluginMenu(
-                self.tr(u'&ClearQuickCRS'),
+                #self.tr(u'&ClearQuickCRS'),
+                u'&ClearQuickCRS',
                 action)
             self.iface.removeToolBarIcon(action)
         # remove the toolbar
