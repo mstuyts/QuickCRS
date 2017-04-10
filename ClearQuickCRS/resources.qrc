@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/plugins/ClearQuickCRS" >
+        <file>icon.png</file>
+    </qresource>
+</RCC>
