@@ -20,14 +20,21 @@
  *                                                                         *
  ***************************************************************************/
 """
-# from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
-from PyQt4.QtCore import QSettings
-from PyQt4.QtGui import QAction, QIcon
-# Initialize Qt resources from file resources.py
-import resources
-# from clear_quickcrs_dialog import ClearQuickCRSDialog
-import os.path
 
+try:
+    from qgis.PyQt.QtCore import QSettings
+except ImportError:
+    from PyQt4.QtCore import QSettings
+try:
+    from qgis.PyQt.QtGui import QIcon
+    from qgis.PyQt.QtWidgets import QAction
+except ImportError:
+    from PyQt4.QtGui import QAction, QIcon
+try:
+    from .resources import *
+except ImportError:
+    from .resources3 import *
+import os.path
 
 class ClearQuickCRS:
     """QGIS Plugin Implementation."""
