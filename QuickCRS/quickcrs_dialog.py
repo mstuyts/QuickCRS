@@ -21,16 +21,28 @@
 """
 
 import os
-from PyQt4 import QtGui, QtCore,uic
+try:
+    from qgis.PyQt.QtCore import *
+except ImportError:
+    from PyQt4.QtCore import *
+try:
+    from qgis.PyQt import uic
+except ImportError:
+    from PyQt4 import uic
+try:
+    from qgis.PyQt.QtGui import QIcon
+    from qgis.PyQt.QtWidgets import QDialog
+except ImportError:
+    from PyQt4.QtGui import QIcon, QDialog
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'quickcrs_dialog_base.ui'))
 
 
-class quickcrsDialog(QtGui.QDialog, FORM_CLASS):
+class quickcrsDialog(QDialog, FORM_CLASS):
     def __init__(self, parent=None):
         super(quickcrsDialog, self).__init__(parent)
-        self.resize(QtCore.QSize(400, 230).expandedTo(self.minimumSizeHint()))
-        self.setWindowIcon(QtGui.QIcon(":/plugins/QuickCRS/icon.png"))
-        self.setWindowFlags( self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint |  QtCore.Qt.CustomizeWindowHint  | QtCore.Qt.WindowTitleHint  )
+        self.resize(QSize(400, 230).expandedTo(self.minimumSizeHint()))
+        self.setWindowIcon(QIcon(":/plugins/QuickCRS/icon.png"))
+        self.setWindowFlags( self.windowFlags() & ~Qt.WindowContextHelpButtonHint |  Qt.CustomizeWindowHint  | Qt.WindowTitleHint  )
         self.setupUi(self)

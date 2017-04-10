@@ -20,11 +20,24 @@
  ***************************************************************************/
 """
 from qgis.core import *
-from qgis.gui import QgsGenericProjectionSelector, QgsProjectionSelector
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-import resources
-from quickcrs_dialog import quickcrsDialog
+try:
+    from qgis.gui import QgsGenericProjectionSelector
+except ImportError:
+    from qgis.gui import QgsProjectionSelectionDialog
+try:
+    from qgis.PyQt.QtCore import *
+except ImportError:
+    from PyQt4.QtCore import *
+try:
+    from qgis.PyQt.QtGui import *
+    from qgis.PyQt.QtWidgets import QAction
+except ImportError:
+    from PyQt4.QtGui import *
+try:
+    from .resources import *
+except ImportError:
+    from .resources3 import *
+from .quickcrs_dialog import quickcrsDialog
 import os.path
 
 class quickcrs:
@@ -180,11 +193,17 @@ class quickcrs:
         previousselectedcrs=s.value("quickcrs/crs", 0)
         if previousselectedcrs=="" or previousselectedcrs==0 or previousselectedcrs is None:
             self.nocrsselected()
-        projSelector = QgsGenericProjectionSelector()
-        projSelector.exec_()
-        projSelector.selectedCrsId()
         global selectedcrs
-        selectedcrs=projSelector.selectedCrsId()
+        try:
+            projSelector = QgsGenericProjectionSelector()
+            projSelector.exec_()
+            projSelector.selectedCrsId()
+            selectedcrs=projSelector.selectedCrsId()
+        except:
+            projSelector = QgsProjectionSelectionDialog()
+            projSelector.exec_()
+            selectedcrsdef = projSelector.crs()
+            selectedcrs=selectedcrsdef.srsid()
         if (selectedcrs=="" or selectedcrs==0 or self.CrsId2AuthID(selectedcrs)=="" or selectedcrs is None):
              selectedcrs=previousselectedcrs
         if (selectedcrs=="" or selectedcrs==0 or self.CrsId2AuthID(selectedcrs)=="" or selectedcrs is None) and (previousselectedcrs=="" or previousselectedcrs==0 or previousselectedcrs is None):
@@ -197,15 +216,19 @@ class quickcrs:
         # Set the CRS of the project to the CRS that is saved in the settings
         s = QSettings()
         selectedcrs=s.value("quickcrs/crs", 0)
-        canvas = self.iface.mapCanvas()
-        if not canvas.hasCrsTransformEnabled():
-            canvas.setCrsTransformEnabled(True)
         target_crs = QgsCoordinateReferenceSystem()
         target_crs.createFromId( selectedcrs, QgsCoordinateReferenceSystem.InternalCrsId )
-        canvas.setDestinationCrs(target_crs)
-        canvas.freeze(False)
-        canvas.setMapUnits(0)
-        canvas.refresh()
+        try:
+            canvas = self.iface.mapCanvas()
+            if not canvas.hasCrsTransformEnabled():
+                canvas.setCrsTransformEnabled(True)
+            canvas.setDestinationCrs(target_crs)
+            canvas.freeze(False)
+            canvas.setMapUnits(0)
+            canvas.refresh()
+        except:
+            QgsProject.instance().setCrs(target_crs)
+
 
     def CrsId2AuthID(self, crsid=0):
         toconvert = QgsCoordinateReferenceSystem()
