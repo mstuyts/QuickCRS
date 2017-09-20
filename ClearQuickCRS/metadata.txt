@@ -1,6 +1,7 @@
 [general]
 name=ClearQuickCRS
-qgisMinimumVersion=2.0
+qgisMinimumVersion=2.14
+qgisMaximumVersion=3.98
 description=Clear QuickCRS settings
 version=0.2
 author=Michel Stuyts
